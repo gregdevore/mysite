@@ -1,8 +1,20 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import loader
-
+from django.contrib.auth.models import User, Group
+from rest_framework import viewsets
+from blogging.serializers import UserSerializer, GroupSerializer
 from blogging.models import Post
+
+class UserViewSet(viewsets.ModelViewSet):
+    """ API endpoint to allow user view/edit """
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserSerializer
+
+class GroupViewSet(viewsets.ModelViewSet):
+    """ API endpoint to allow gorup view/edit """
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
 def list_view(request):
     published = Post.objects.exclude(published_date__exact=None)
