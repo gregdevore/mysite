@@ -18,6 +18,7 @@ from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 from rest_framework import routers
 from blogging import views
+from blogging.feeds import LatestPostsFeed
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
@@ -29,6 +30,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('blogging/', include('blogging.urls')),
     path('polling/', include('polling.urls')),
+    path('latest/feed/', LatestPostsFeed()),
     path('admin/', admin.site.urls),
     path('login/', LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
