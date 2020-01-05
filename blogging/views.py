@@ -3,8 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import loader
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from blogging.serializers import UserSerializer, GroupSerializer
-from blogging.models import Post
+from blogging.serializers import UserSerializer, GroupSerializer, PostSerializer, CategorySerializer
+from blogging.models import Post, Category
 
 class UserViewSet(viewsets.ModelViewSet):
     """ API endpoint to allow user view/edit """
@@ -16,14 +16,20 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
+class PostViewSet(viewsets.ModelViewSet):
+    """ API endpoint to allow post view/edit """
+    queryset = Post.objects.all().order_by('-created_date')
+    serializer_class = PostSerializer
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    """ API endpoint to allow category view/edit """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
 def list_view(request):
     published = Post.objects.exclude(published_date__exact=None)
     posts = published.order_by('-published_date')
-    # template = loader.get_template('blogging/list.html')
     context = {'posts':posts}
-    # body = template.render(context)
-
-    # return HttpResponse(body, content_type='text/html')
     return render(request, 'blogging/list.html', context)
 
 def detail_view(request, post_id):
@@ -34,14 +40,3 @@ def detail_view(request, post_id):
         raise Http404
     context = {'post':post}
     return render(request, 'blogging/detail.html', context)
-
-def stub_view(request, *args, **kwargs):
-    body = 'Stub View\n\n'
-    if args:
-        body += 'Args:\n'
-        body += '\n'.join(['\t%s' % a for a in args])
-    if kwargs:
-        body += 'Kwargs:\n'
-        body += '\n'.join(['\t%s: %s' % i for i in kwargs.items()])
-
-    return HttpResponse(body, content_type='text/plain')
